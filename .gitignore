@@ -1,0 +1,6 @@
+.idea/**
+vendor/**
+dn/**
+build/**
+bundle/**
+package-lock.php.yml

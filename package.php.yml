@@ -1,0 +1,16 @@
+name: Bundle Manager
+version: 1.0.0
+deps:
+  jphp-core: '*'
+  jphp-zend-ext: '*'
+
+devDeps:
+  dn-bundle-plugin: '*'
+
+develnext-bundle:
+  version: '%version%'
+  name: '%name%'
+  author: silentrs
+  icon: develnext/bundle/bundlemanager/icon32.png
+  hidden: true
+  class: develnext\bundle\bundlemanager\BundleManageBundle

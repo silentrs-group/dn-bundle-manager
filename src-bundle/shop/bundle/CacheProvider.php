@@ -1,0 +1,72 @@
+<?php
+
+namespace shop\bundle;
+
+use ide\Logger;
+use php\lib\str;
+use php\util\Flow;
+
+class CacheProvider extends BaseBundleProvider
+{
+    /**
+     * @var LocalProvider
+     */
+    private $local;
+
+    /**
+     * @var GithubProvider
+     */
+    private $github;
+
+    public function setLocal($value)
+    {
+        $this->local = $value;
+    }
+
+    public function setGithub($value)
+    {
+        $this->github = $value;
+    }
+
+    public function init()
+    {
+        Logger::info("Cache loaded");
+    }
+
+    public function update()
+    {
+        $this->list = Flow::of($this->mergeList($this->local->getList(), $this->github->getList()))->sort(function ($a, $b) {
+            return str::compare(str::lower($a->name), str::lower($b->name));
+        });
+    }
+
+    private function mergeList($a, $b)
+    {
+        $tempList = $a;
+
+        foreach ($tempList as $key => $item) {
+            if ($item === false) {
+                unset($tempList[$key]);
+            }
+        }
+
+        sort($tempList);
+
+        foreach ($b as $obj) {
+            foreach ($tempList as $key => $_obj) {
+                if ($obj->name == $_obj->name) {
+                    $tempList[$key] = $obj;
+                    continue 2;
+                }
+            }
+
+            $tempList[] = $obj;
+        }
+
+        $tempList = Flow::of($tempList)->sort(function ($a, $b) {
+            return str::compare(str::lower($a->name), str::lower($b->name));
+        });
+
+        return $tempList;
+    }
+}

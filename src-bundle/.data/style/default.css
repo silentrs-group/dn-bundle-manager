@@ -1,0 +1,61 @@
+/* JavaFX CSS Style with -fx- prefix */
+
+.search {
+    -fx-border-color: lightgray;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-background-color: white;
+}
+
+.search:focused {
+    -fx-effect: dropshadow(one-pass-box, #0000000F, 25, 0.2, 0, 5);
+}
+
+.listitem {
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-background-color: #FFFFFF;
+    -fx-border-width: 1;
+    -fx-border-color: lightgray;
+}
+
+.listitem:hover {
+    -fx-effect: dropshadow(one-pass-box, #0000000F, 25, 0.2, 0, 5);
+}
+
+.installed {
+    -fx-border-color: #49c969;
+}
+
+.scroll-pane, .scroll-pane .viewport {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-padding: 0;
+}
+
+.scroll-pane .viewport {
+    -fx-border-color: transparent;
+    -fx-padding: 5;
+}
+
+.nav {
+    -fx-hgap: 5;
+}
+
+.nav .nav-item {
+    -fx-background-insets: 0, 1;
+    -fx-background-color: lightgray, #FAFAFA;
+    -fx-min-width: 30;
+    -fx-min-height: 30;
+}
+
+.nav .selected {
+    -fx-background-insets: 0;
+    -fx-background-color: white;
+    -fx-text-fill: black;
+    
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+    -fx-font-weight: bold;
+}
+
