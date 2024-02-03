@@ -2,6 +2,7 @@
 
 namespace shop;
 
+use ide\commands\TestCommand;
 use ide\Ide;
 use php\io\MemoryStream;
 use php\lib\fs;
@@ -68,7 +69,7 @@ class BundleService
         return $this->github->uninstall($name);
     }
 
-    public function update ($url, $name, $node = null)
+    public function update($url, $name, $node = null)
     {
         $this->github->updateBundle($url, $name, $node);
     }
@@ -76,13 +77,14 @@ class BundleService
     public function loadFromCache($image)
     {
         $memory = new MemoryStream();
-        $memory->write(file_get_contents(Ide::get()->getUserHome() . '\bundleManager\\' . md5($image)));
+        $memory->write(file_get_contents(Ide::get()->getUserHome() . TestCommand::CACHE_DIR . '\\' . md5($image)));
         $memory->seek(0);
         return $memory;
     }
 
     public function has($image)
     {
-        return fs::exists(Ide::get()->getUserHome() . '\bundleManager\\' . md5($image)) && fs::size(Ide::get()->getUserHome() . '\bundleManager\\' . md5($image)) > 0;
+        $path = Ide::get()->getUserHome() . TestCommand::CACHE_DIR . '\\' . md5($image);
+        return fs::exists($path) && fs::size($path) > 0;
     }
 }

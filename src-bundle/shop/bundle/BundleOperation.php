@@ -19,6 +19,7 @@ use php\util\Configuration;
 use php\util\Regex;
 use shop\ui\UIActionButton;
 use gui;
+use shop\ui\UIShop;
 
 class BundleOperation
 {
@@ -213,11 +214,10 @@ class BundleOperation
      */
     private function download($url, File $file): bool
     {
-        $http = new HttpClient();
-        $http->responseType = "STREAM";
-        $r = $http->get($url, []);
+        $memory = new MemoryStream();
+        $memory->write(file_get_contents($url));
 
-        if ($r->statusCode() != 200) {
+        if ($memory->length() < 1) {
             uiLater(function () {
                 UXDialog::show('Ошибка загрузки пакета');
                 Ide::get()->getMainForm()->hidePreloader();
@@ -225,7 +225,9 @@ class BundleOperation
             return false;
         }
 
-        FileUtils::copyFile($r->body(), $file);
+        $memory->seek(0);
+
+        FileUtils::copyFile($memory, $file);
 
         return true;
     }

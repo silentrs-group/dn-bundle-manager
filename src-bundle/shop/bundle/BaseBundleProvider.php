@@ -4,6 +4,7 @@ namespace shop\bundle;
 
 use gui;
 use php\compress\ZipFile;
+use shop\dto\Bundle;
 
 abstract class BaseBundleProvider
 {
@@ -12,6 +13,9 @@ abstract class BaseBundleProvider
      */
     public $bundleOperation;
 
+    /**
+     * @var Bundle[]
+     */
     protected $list = [];
 
     public function __construct()
@@ -24,27 +28,37 @@ abstract class BaseBundleProvider
 
     public abstract function update();
 
-    public function getList()
+    /**
+     * @return Bundle[]
+     */
+    public function getList(): array
     {
         return $this->list;
     }
 
-    public function addBundleFromUrl($url, $node = null)
+    public function addBundleFromUrl($url, $node = null): void
     {
         $this->bundleOperation->addBundleFromUrl($url, $node);
         $this->bundleOperation->refresh();
     }
 
-    public function updateBundle($url, $name, $node = null)
+    /**
+     * @param string $url
+     * @param string $name
+     * @param $node
+     * @return void
+     */
+    public function updateBundle(string $url, string $name, $node = null): void
     {
         $this->bundleOperation->update($url, $this->bundleOperation->get($name), $node);
         $this->bundleOperation->refresh();
     }
 
     /**
-     * @throws \Exception
+     * @param string $name
+     * @return bool
      */
-    public function uninstall($name)
+    public function uninstall(string $name): bool
     {
         $state = $this->bundleOperation->remove($this->bundleOperation->get($name));
         $this->bundleOperation->refresh();

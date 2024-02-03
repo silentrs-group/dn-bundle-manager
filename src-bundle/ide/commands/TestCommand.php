@@ -21,6 +21,8 @@ use shop\ui\UIShop;
 class TestCommand extends AbstractCommand
 {
 
+    const CACHE_DIR = '\bundleManager';
+
     /**
      * @var UIShop
      */
@@ -70,7 +72,7 @@ class TestCommand extends AbstractCommand
         $btn = new UXButton();
         $btn->graphic = ico("cart");
         $btn->font->bold = true;
-        $btn->text = "Магазин бандлов";
+        $btn->text = "Магазин пакетов";
         try {
             $btn->on("click", [$this, "onExecute"]);
         } catch (\Exception $ignore) {
@@ -88,6 +90,8 @@ class TestCommand extends AbstractCommand
     function makeItem(Bundle $bundle, $installList): void
     {
         $node = new UIBundleItem();
+        $this->form->addItem($node);
+
         $node->setName($bundle->name);
         $node->setAuthor($bundle->author);
         $node->setDescrition($bundle->description);
@@ -95,7 +99,6 @@ class TestCommand extends AbstractCommand
         $node->setVersion($bundle->version);
         $this->setState($bundle, $node, $installList);
 
-        $this->form->addItem($node);
         $node->setActionButton(UIActionButton::STATE_INSTALL, function () use ($bundle, $node) {
             $this->service->install($bundle->url, $node);
         });

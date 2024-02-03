@@ -7,7 +7,10 @@ use framework;
 use app;
 use ide\Ide;
 use ide\Logger;
+use php\gui\framework\EventBinder;
+use php\io\MemoryStream;
 use php\io\Stream;
+use php\lang\Thread;
 use php\lib\fs;
 use php\lib\str;
 use std;
@@ -82,7 +85,7 @@ class UIBundleItem
             $this->actionButton->getNode()
         ]));
 
-        
+
         if ($this->state == UIActionButton::STATE_UNINSTALL) {
             $this->container->classes->add("installed");
         }
@@ -106,7 +109,7 @@ class UIBundleItem
     
     private function makeIcon ()
     {
-        $this->icon = new UXImageView(new UXImage('res://.data/img/default.png', $this->iconSize[0], $this->iconSize[1]));
+        $this->icon = new UXImageArea(new UXImage('res://.data/img/default.png', $this->iconSize[0], $this->iconSize[1]));
         $this->icon->smooth = true;
         $this->icon->width = $this->iconSize[0];
         $this->icon->height = $this->iconSize[1];
@@ -173,8 +176,6 @@ class UIBundleItem
     
     public function setIcon ($path)
     {
-        // $this->icon->image = new UXImage($stream, $this->iconSize[0], $this->iconSize[1]);
-
         $this->icon->image = new UXImage('res://.data/img/default.png', $this->iconSize[0], $this->iconSize[1]);
 
         if (empty($path)) {
@@ -183,13 +184,21 @@ class UIBundleItem
 
 
         if (str::startsWith($path, "http")) {
-            $http = new HttpClient();
-            $http->responseType = "STREAM";
-            $http->getAsync($path, [], function (HttpResponse $response) use ($path) {
-                $image = $response->body();
-                fs::copy($image, Ide::get()->getUserHome() . '\bundleManager\\' . md5($path));
-                $this->icon->image = new UXImage(Ide::get()->getUserHome() . '\bundleManager\\' . md5($path), $this->iconSize[0], $this->iconSize[1]);
+            $th = new Thread(function () use ($path) {
+                $memory = new MemoryStream();
+                $memory->write(file_get_contents($path));
+
+                if ($memory->length() > 0) {
+                    $memory->seek(0);
+                    fs::copy($memory, Ide::get()->getUserHome() . '\bundleManager\\' . md5($path));
+
+                    uiLater(function () use ($path) {
+                        $this->icon->image = new UXImage(Ide::get()->getUserHome() . '\bundleManager\\' . md5($path), $this->iconSize[0], $this->iconSize[1]);
+                    });
+                }
             });
+            $th->setDaemon(true);
+            $th->start();
         } else {
             if ($path instanceof Stream) {
                 $path->seek(0);
@@ -210,9 +219,24 @@ class UIBundleItem
     {
         $this->description->text = $value;
 
-        $tooltip = new UXTooltip();
-        $tooltip->text = $value;
-        UXTooltip::install($this->description, $tooltip);
+        #UXTooltip::install($this->description, UXToolTip::of($value));
+        #return;
+
+
+        $this->description->on("mouseEnter", function ($e) use ($value) {
+            $this->tool = $this->getTooltip($value);
+            // $tool->showByNode($this->description, $position - $this->description->width / 2 - 12 , 28);
+            $x = 0;
+            if (($width = UXFont::getDefault()->withSize(14)->calculateTextWidth($value)) > 220) {
+                $x  = -(($width - 220) / 2);
+            }
+
+            $this->tool->showByNode($e->sender, $x, 12);
+        });
+
+        $this->description->on("mouseExit", function () {
+            $this->tool->hide();
+        });
     }
     
     public function setAuthor ($value)
@@ -224,7 +248,36 @@ class UIBundleItem
     {
         $this->version->text = "ver: " . $value;
     }
-    
-    
-    
+
+
+    /**
+     * @return UXTooltip
+     */
+    private function getTooltip ($text) {
+        static $tool = null, $label;
+
+        if ($tool == null) {
+            $tool = new UXTooltip();
+            $tool->graphic = new UXVBox([$ar = new UXPane(), $label = new UXLabelEx($text)]);
+            $tool->graphic->classes->add("custom-tooltip");
+            $tool->graphic->spacing = 5;
+
+            $ar->classes->add('arrow-toltip');
+            $ar->maxWidth = 16;
+            $ar->minHeight = 10;
+            $tool->graphic->alignment = "CENTER";
+            $tool->style = '-fx-background-color: transparent;';
+        }
+
+        $label->text = $text;
+
+        return $tool;
+    }
+
+    public function getName()
+    {
+        return $this->name->text;
+    }
+
+
 }

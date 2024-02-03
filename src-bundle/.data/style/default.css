@@ -1,5 +1,11 @@
 /* JavaFX CSS Style with -fx- prefix */
 
+* {
+    -main-color: #15111d;
+    -button-color: skyblue;
+    -tooltip-color: rgba(56, 56, 56, 0.4);
+}
+
 .search {
     -fx-border-color: lightgray;
     -fx-border-radius: 5;
@@ -58,4 +64,20 @@
     -fx-background-radius: 3;
     -fx-font-weight: bold;
 }
+
+.arrow-toltip {
+    -fx-shape: 'M1.5 21.5H48.5L31.5 4.5C31.5 4.5 28.5899 1 25 1C21.4101 1 18.5 4.5 18.5 4.5L1.5 21.5Z';
+    -fx-background-color: -tooltip-color;
+    -fx-border-color: transparent;
+}
+
+.custom-tooltip {
+    -fx-font-size: 14;
+    -fx-background-color: -tooltip-color;
+    -fx-background-insets: 15 0 0 0;
+    -fx-padding: 5 10;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+
 

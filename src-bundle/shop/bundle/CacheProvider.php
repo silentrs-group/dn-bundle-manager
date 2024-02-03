@@ -5,6 +5,7 @@ namespace shop\bundle;
 use ide\Logger;
 use php\lib\str;
 use php\util\Flow;
+use shop\dto\Bundle;
 
 class CacheProvider extends BaseBundleProvider
 {
@@ -40,7 +41,12 @@ class CacheProvider extends BaseBundleProvider
         });
     }
 
-    private function mergeList($a, $b)
+    /**
+     * @param $a
+     * @param $b
+     * @return Bundle[]
+     */
+    private function mergeList($a, $b): array
     {
         $tempList = $a;
 
@@ -63,10 +69,8 @@ class CacheProvider extends BaseBundleProvider
             $tempList[] = $obj;
         }
 
-        $tempList = Flow::of($tempList)->sort(function ($a, $b) {
+        return Flow::of($tempList)->sort(function ($a, $b) {
             return str::compare(str::lower($a->name), str::lower($b->name));
         });
-
-        return $tempList;
     }
 }

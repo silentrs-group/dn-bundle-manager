@@ -2,26 +2,21 @@
 
 namespace develnext\bundle\bundlemanager;
 
+use develnext\bundle\httpclient\HttpClientBundle;
 use ide\account\api\AccountService;
-use ide\account\IdeService;
 use ide\bundle\AbstractBundle;
-use ide\commands\IdeLogShowCommand;
+use ide\bundle\AbstractJarBundle;
 use ide\commands\MyAccountCommand;
 use ide\commands\TestCommand;
-use ide\commands\theme\IDETheme;
 use ide\library\IdeLibraryBundleResource;
 use ide\Ide;
 use ide\Logger;
-use ide\project\Project;
-use ide\settings\ide\IDESettingsGroup;
-use ide\systems\Cache;
-use ide\systems\IdeSystem;
 use php\gui\UXButton;
 use php\lib\fs;
 use php\time\Timer;
 use gui;
 
-class BundleManageBundle extends AbstractBundle
+class BundleManageBundle extends AbstractJarBundle
 {
     private static $command = null;
 
@@ -31,10 +26,9 @@ class BundleManageBundle extends AbstractBundle
             return;
         }
 
-        fs::makeDir(Ide::get()->getUserHome() . '\bundleManager');
+        fs::makeDir(Ide::get()->getUserHome() . TestCommand::CACHE_DIR);
 
         self::$command = $test = new TestCommand();
-
 
         if (Ide::get()->getMainForm()->getHeadPane()->children->offsetGet(0) instanceof UXButton::class) {
             if (Ide::get()->getMainForm()->getHeadPane()->children->offsetGet(0)->text == $test->makeUiForHead()->text) return;
@@ -53,4 +47,10 @@ class BundleManageBundle extends AbstractBundle
         Ide::get()->getMainForm()->getHeadPane()->children->insert(0, $test->makeUiForHead());
     }
 
+    public function getDependencies()
+    {
+        return [
+            HttpClientBundle::class
+        ];
+    }
 }
