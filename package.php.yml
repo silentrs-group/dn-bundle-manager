@@ -1,5 +1,5 @@
 name: Bundle Manager
-version: 1.0.0
+version: 1.0.1
 deps:
   jphp-core: '*'
   jphp-zend-ext: '*'
