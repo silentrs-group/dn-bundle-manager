@@ -52,6 +52,7 @@ class UIShop
     {
         $this->container = new UXForm();
         self::$mainForm = $this->container;
+
         $this->container->resizable = false;
         $this->container->icons->addAll(Ide::get()->getMainForm()->icons);
         $this->container->title = "Менеджер пакетов";
@@ -69,6 +70,8 @@ class UIShop
         $this->container->add($this->makeSearch());
 
         $this->container->add($this->makeDonate());
+
+        $this->bindShortcutKey ();
     }
     
     private function makeListContainer ()
@@ -223,5 +226,14 @@ class UIShop
 
     public static function getMainForm() {
         return self::$mainForm;
+    }
+
+    private function bindShortcutKey()
+    {
+        $this->container->on('keyDown', function ($ev) {
+            if ($ev->controlDown && $ev->codeName == "F") {
+                $this->search->requestFocus();
+            }
+        });
     }
 }
