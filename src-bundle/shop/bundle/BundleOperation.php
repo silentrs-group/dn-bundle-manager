@@ -19,6 +19,7 @@ use php\util\Configuration;
 use php\util\Regex;
 use shop\ui\UIActionButton;
 use gui;
+use shop\ui\UIBundleItem;
 use shop\ui\UIShop;
 
 class BundleOperation
@@ -33,11 +34,12 @@ class BundleOperation
         $this->bundlePath = fs::normalize(System::getProperty("user.home") . '\DevelNextLibrary\bundles');
     }
 
-    public function addBundleFromUrl($url, $node = null)
+    public function addBundleFromUrl($url, UIBundleItem $node = null)
     {
         $file = Ide::get()->createTempFile('.dnbundle');
 
-        Ide::get()->getMainForm()->showPreloader('Подождите, загрузка пакета ...');
+        $node->showProgress();
+        //Ide::get()->getMainForm()->showPreloader('Подождите, загрузка пакета ...');
 
         Ide::async(function () use ($url, $file, $node) {
             if (!$this->download($url, $file)) return;
@@ -46,8 +48,9 @@ class BundleOperation
                 $this->successBundleInstall($file, $node);
             });
 
-            uiLater(function () {
+            uiLater(function () use ($node) {
                 Ide::get()->getMainForm()->hidePreloader();
+                $node->hideProgress();
                 Ide::get()->getLibrary()->updateCategory('bundles');
             });
         });
@@ -89,11 +92,12 @@ class BundleOperation
         return true;
     }
 
-    public function update($url, $bundle, $node)
+    public function update($url, $bundle, UIBundleItem $node)
     {
         $file = Ide::get()->createTempFile('.dnbundle');
 
-        Ide::get()->getMainForm()->showPreloader('Подождите, загрузка пакета ...');
+        $node->showProgress();
+        // Ide::get()->getMainForm()->showPreloader('Подождите, загрузка пакета ...');
 
         Ide::async(function () use ($url, $file, $node, $bundle) {
             if (!$this->download($url, $file)) return;
@@ -104,9 +108,9 @@ class BundleOperation
                 $this->successBundleInstall($file, $node);
             });
 
-            uiLater(function () {
-                Ide::get()->getMainForm()->hidePreloader();
+            uiLater(function () use ($node) {
                 Ide::get()->getLibrary()->updateCategory('bundles');
+                $node->hideProgress();
             });
         });
     }
@@ -125,7 +129,6 @@ class BundleOperation
         $state = fs::delete($path . '.resource');
 
         uiLater(function () {
-            Ide::get()->getMainForm()->hidePreloader();
             Ide::get()->getLibrary()->updateCategory('bundles');
         });
 
@@ -212,15 +215,15 @@ class BundleOperation
      * @param File $file
      * @return bool
      */
-    private function download($url, File $file): bool
+    private function download($url, File $file, UIBundleItem $node = null): bool
     {
         $memory = new MemoryStream();
         $memory->write(file_get_contents($url));
 
         if ($memory->length() < 1) {
-            uiLater(function () {
+            uiLater(function () use ($node) {
                 UXDialog::show('Ошибка загрузки пакета');
-                Ide::get()->getMainForm()->hidePreloader();
+                $node->hideProgress();
             });
             return false;
         }
@@ -237,15 +240,15 @@ class BundleOperation
      * @param $node
      * @return void
      */
-    function successBundleInstall(File $file, $node): void
+    function successBundleInstall(File $file, UIBundleItem $node): void
     {
         if (!$file->delete()) {
             $file->deleteOnExit();
         }
 
         uiLater(function () use ($node) {
-            Ide::get()->getMainForm()->hidePreloader();
             Ide::get()->getLibrary()->updateCategory('bundles');
+            $node->hideProgress();
 
             if ($node == null) return;
             $node->setState(UIActionButton::STATE_UNINSTALL);

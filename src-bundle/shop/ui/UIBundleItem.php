@@ -1,13 +1,10 @@
 <?php
+
 namespace shop\ui;
 
-use bundle\http\HttpClient;
-use bundle\http\HttpResponse;
 use framework;
-use app;
 use ide\Ide;
 use ide\Logger;
-use php\gui\framework\EventBinder;
 use php\io\MemoryStream;
 use php\io\Stream;
 use php\lang\Thread;
@@ -16,70 +13,100 @@ use php\lib\str;
 use std;
 use gui;
 
-class UIBundleItem 
+class UIBundleItem
 {
+    private $container;
+
     /**
      * @var UXHBox
      */
-    private $container;
-    
+    private $baseContainer;
+
     /**
      * @var UXImageArea
      */
     private $icon;
-    
+
     /**
      * @var UXLabelEx
      */
     private $name;
-    
+
     /**
      * @var UXLabelEx
      */
     private $description;
-    
+
     /**
      * @var UXLabelEx
      */
     private $version;
-    
+
     /**
      * @var UXLabelEx
      */
     private $author;
-    
+
     /**
      * @var UIActionButton
      */
     private $actionButton;
-    
+
+    /**
+     * @var UXProgressIndicator
+     */
+    private $progress;
+
+    /**
+     * @var int[]
+     */
     private $iconSize = [32, 32];
-    private $containerWidth = 200;
+
+    /**
+     * @var int
+     */
+    private $containerWidth = 201;
+
+    /**
+     * @var int
+     */
     private $state = 0;
 
 
-    public function __construct () {
+    public function __construct()
+    {
         $this->make();
     }
-    
-    private function make ()
+
+    private function make()
     {
         $this->actionButton = new UIActionButton();
-        
-        $this->container = new UXHBox();
-        $this->container->alignment = 'CENTER_LEFT';
+
+        $this->container = new UXStackPane();
         $this->container->minWidth = $this->containerWidth;
-        $this->container->padding = 5;
-        $this->container->paddingLeft = 10;
-        $this->container->maxWidth = 291;
-        
-        $this->container->classes->add("listitem");
-        
-        $this->container->add($this->makeIcon());
-        $this->container->add($infoContainer = new UXVBox());
-        
+        $this->container->maxWidth = 290;
+
+        $this->baseContainer = new UXHBox();
+
+        $this->container->add($this->baseContainer);
+
+        $this->baseContainer->alignment = 'CENTER_LEFT';
+        $this->baseContainer->minWidth = $this->containerWidth;
+        $this->baseContainer->padding = 5;
+        $this->baseContainer->paddingLeft = 10;
+        $this->baseContainer->maxWidth = 290;
+        $this->baseContainer->leftAnchor =
+        $this->baseContainer->topAnchor =
+        $this->baseContainer->rightAnchor =
+        $this->baseContainer->bottomAnchor = 0;
+
+        $this->baseContainer->classes->add("listitem");
+
+        $this->baseContainer->add($this->makeIcon());
+        $this->baseContainer->add($infoContainer = new UXVBox());
+
         $infoContainer->paddingLeft = 10;
-        
+
         $infoContainer->add(new UXHBox([
             $this->makeName(),
             $this->actionButton->getNode()
@@ -87,94 +114,95 @@ class UIBundleItem
 
 
         if ($this->state == UIActionButton::STATE_UNINSTALL) {
-            $this->container->classes->add("installed");
+            $this->baseContainer->classes->add("installed");
         }
-        
+
         $this->actionButton->setState($this->state);
-        
+
         $this->actionButton->setAction(UIActionButton::STATE_UNINSTALL, function () {
             Logger::info("uninstall " . $this->name->text);
         });
-        
+
         $this->actionButton->setAction(UIActionButton::STATE_INSTALL, function () {
             Logger::info("install " . $this->name->text);
         });
-        
+
         $infoContainer->add($this->makeDescription());
         $infoContainer->add($subInfoContainer = new UXHBox());
-        
+
         $subInfoContainer->add($this->makeAuthor());
         $subInfoContainer->add($this->makeVersion());
+        $this->makeProgress();
     }
-    
-    private function makeIcon ()
+
+    private function makeIcon(): UXImageArea
     {
         $this->icon = new UXImageArea(new UXImage('res://.data/img/default.png', $this->iconSize[0], $this->iconSize[1]));
         $this->icon->smooth = true;
         $this->icon->width = $this->iconSize[0];
         $this->icon->height = $this->iconSize[1];
         $this->icon->backgroundColor = '#0000000F';
-        
+
         $this->icon->clip = new UXCircle();
         $this->icon->clip->width = $this->iconSize[0];
         $this->icon->clip->height = $this->iconSize[1];
         $this->icon->clip->x = $this->icon->clip->y = 0;
-        
+
         return $this->icon;
     }
-    
-    private function makeName ()
+
+    private function makeName(): UXLabelEx
     {
         $this->name = new UXLabelEx();
         $this->name->minWidth =
         $this->name->maxWidth = 216;
         $this->name->font->bold = true;
-        
+
         return $this->name;
     }
-    
-    private function makeDescription ()
+
+    private function makeDescription(): UXLabelEx
     {
         $this->description = new UXLabelEx();
         $this->description->textColor = 'gray';
-        
+
         return $this->description;
     }
-    
-    private function makeAuthor ()
+
+    private function makeAuthor(): UXLabelEx
     {
         $this->author = new UXLabelEx();
         $this->author->minWidth = 173;
         $this->author->textColor = 'skyblue';
-        
+
         return $this->author;
     }
-    
-    private function makeVersion ()
+
+    private function makeVersion(): UXLabelEx
     {
         $this->version = new UXLabelEx();
         $this->version->minWidth = 60;
         $this->version->textColor = 'lightgray';
-        
+
         return $this->version;
     }
-    
-    public function setActionButton ($state, $callback)
+
+    public function setActionButton($state, $callback)
     {
         $this->actionButton->setAction($state, $callback);
     }
-    
-    public function getNode ()
+
+    public function getNode(): UXStackPane
     {
         return $this->container;
     }
 
-    public function setState ($state)
+    public function setState($state)
     {
         $this->actionButton->setState($state);
     }
-    
-    public function setIcon ($path)
+
+    public function setIcon($path)
     {
         $this->icon->image = new UXImage('res://.data/img/default.png', $this->iconSize[0], $this->iconSize[1]);
 
@@ -209,26 +237,21 @@ class UIBundleItem
             $this->icon->stretch = true;
         }
     }
-    
-    public function setName ($value)
+
+    public function setName($value)
     {
         $this->name->text = $value;
     }
-    
-    public function setDescrition ($value)
+
+    public function setDescription($value)
     {
         $this->description->text = $value;
 
-        #UXTooltip::install($this->description, UXToolTip::of($value));
-        #return;
-
-
         $this->description->on("mouseEnter", function ($e) use ($value) {
             $this->tool = $this->getTooltip($value);
-            // $tool->showByNode($this->description, $position - $this->description->width / 2 - 12 , 28);
             $x = 0;
             if (($width = UXFont::getDefault()->withSize(14)->calculateTextWidth($value)) > 220) {
-                $x  = -(($width - 220) / 2);
+                $x = -(($width - 220) / 2);
             }
 
             $this->tool->showByNode($e->sender, $x, 12);
@@ -238,22 +261,24 @@ class UIBundleItem
             $this->tool->hide();
         });
     }
-    
-    public function setAuthor ($value)
+
+    public function setAuthor($value)
     {
         $this->author->text = $value;
     }
-    
-    public function setVersion ($value)
+
+    public function setVersion($value)
     {
         $this->version->text = "ver: " . $value;
     }
 
 
     /**
+     * @param $text
      * @return UXTooltip
      */
-    private function getTooltip ($text) {
+    private function getTooltip($text): UXTooltip
+    {
         static $tool = null, $label;
 
         if ($tool == null) {
@@ -277,6 +302,31 @@ class UIBundleItem
     public function getName()
     {
         return $this->name->text;
+    }
+
+    private function makeProgress()
+    {
+        $this->progress = new UXProgressIndicator();
+        $this->container->add($this->progress);
+        $this->progress->maxWidth = 32;
+        $this->progress->maxHeight = 32;
+        $this->progress->visible = false;
+    }
+
+    public function showProgress()
+    {
+        uiLater(function () {
+            $this->baseContainer->enabled = false;
+            $this->progress->visible = true;
+        });
+    }
+
+    public function hideProgress()
+    {
+        uiLater(function () {
+            $this->baseContainer->enabled = true;
+            $this->progress->visible = false;
+        });
     }
 
 

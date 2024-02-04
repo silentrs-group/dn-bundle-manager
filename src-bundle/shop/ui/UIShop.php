@@ -139,7 +139,7 @@ class UIShop
         $this->search->height = 32;
         $this->search->topAnchor = 20;
         $this->search->leftAnchor = 15;
-        $this->search->rightAnchor = 19;
+        $this->search->rightAnchor = 24;
         $this->search->minWidth = 500;
         $this->search->observer("text")->addListener(function ($o, $new) {
             if ($new == "") $this->updateList();

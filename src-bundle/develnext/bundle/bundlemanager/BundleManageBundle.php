@@ -7,7 +7,7 @@ use ide\account\api\AccountService;
 use ide\bundle\AbstractBundle;
 use ide\bundle\AbstractJarBundle;
 use ide\commands\MyAccountCommand;
-use ide\commands\TestCommand;
+use ide\commands\BundleManagerCommand;
 use ide\library\IdeLibraryBundleResource;
 use ide\Ide;
 use ide\Logger;
@@ -26,9 +26,9 @@ class BundleManageBundle extends AbstractJarBundle
             return;
         }
 
-        fs::makeDir(Ide::get()->getUserHome() . TestCommand::CACHE_DIR);
+        fs::makeDir(Ide::get()->getUserHome() . BundleManagerCommand::CACHE_DIR);
 
-        self::$command = $test = new TestCommand();
+        self::$command = $test = new BundleManagerCommand();
 
         if (Ide::get()->getMainForm()->getHeadPane()->children->offsetGet(0) instanceof UXButton::class) {
             if (Ide::get()->getMainForm()->getHeadPane()->children->offsetGet(0)->text == $test->makeUiForHead()->text) return;

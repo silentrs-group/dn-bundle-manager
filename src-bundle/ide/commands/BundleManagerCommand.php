@@ -18,7 +18,7 @@ use shop\ui\UIActionButton;
 use shop\ui\UIBundleItem;
 use shop\ui\UIShop;
 
-class TestCommand extends AbstractCommand
+class BundleManagerCommand extends AbstractCommand
 {
 
     const CACHE_DIR = '\bundleManager';
@@ -94,7 +94,7 @@ class TestCommand extends AbstractCommand
 
         $node->setName($bundle->name);
         $node->setAuthor($bundle->author);
-        $node->setDescrition($bundle->description);
+        $node->setDescription($bundle->description);
         $this->setIcon($bundle, $node);
         $node->setVersion($bundle->version);
         $this->setState($bundle, $node, $installList);
@@ -137,7 +137,7 @@ class TestCommand extends AbstractCommand
     private function setState(Bundle $bundle, UIBundleItem $node, $installList): void
     {
         if (empty($bundle->url)) {
-            $node->setState(UIActionButton::STATE_UNENDEFINED);
+            $node->setState(UIActionButton::STATE_UNDEFINED);
         } else {
             $state = UIActionButton::STATE_INSTALL;
             foreach ($installList as $item) {

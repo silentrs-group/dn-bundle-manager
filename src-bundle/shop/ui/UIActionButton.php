@@ -9,7 +9,7 @@ class UIActionButton
     const STATE_INSTALL     = 0b001;
     const STATE_UNINSTALL   = 0b010;
     const STATE_UPDATE      = 0b100;
-    const STATE_UNENDEFINED = 0;
+    const STATE_UNDEFINED   = 0;
     
     private $container;
     
@@ -69,7 +69,7 @@ class UIActionButton
             case UIActionButton::STATE_INSTALL:    $img = 'res://.data/img/download.png';  break;
             case UIActionButton::STATE_UNINSTALL:  $img = 'res://.data/img/close.png';     break;
             case UIActionButton::STATE_UPDATE:     $img = 'res://.data/img/update.png';    break;
-            default: $img = 'res://.data/img/unendefined.png';
+            default:                               $img = 'res://.data/img/undefined.png';
         }
         
         

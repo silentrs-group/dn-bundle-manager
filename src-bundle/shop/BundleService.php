@@ -2,7 +2,7 @@
 
 namespace shop;
 
-use ide\commands\TestCommand;
+use ide\commands\BundleManagerCommand;
 use ide\Ide;
 use php\io\MemoryStream;
 use php\lib\fs;
@@ -77,14 +77,14 @@ class BundleService
     public function loadFromCache($image)
     {
         $memory = new MemoryStream();
-        $memory->write(file_get_contents(Ide::get()->getUserHome() . TestCommand::CACHE_DIR . '\\' . md5($image)));
+        $memory->write(file_get_contents(Ide::get()->getUserHome() . BundleManagerCommand::CACHE_DIR . '\\' . md5($image)));
         $memory->seek(0);
         return $memory;
     }
 
     public function has($image)
     {
-        $path = Ide::get()->getUserHome() . TestCommand::CACHE_DIR . '\\' . md5($image);
+        $path = Ide::get()->getUserHome() . BundleManagerCommand::CACHE_DIR . '\\' . md5($image);
         return fs::exists($path) && fs::size($path) > 0;
     }
 }
