@@ -233,6 +233,8 @@ class UIShop
         $this->container->on('keyDown', function ($ev) {
             if ($ev->controlDown && $ev->codeName == "F") {
                 $this->search->requestFocus();
+            } else if ($ev->codeName == "Esc") {
+                $this->container->hide();
             }
         });
     }
