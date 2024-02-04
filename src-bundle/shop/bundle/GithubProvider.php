@@ -2,12 +2,10 @@
 
 namespace shop\bundle;
 
-use develnext\bundle\httpclient\HttpClientBundle;
-use bundle\http\HttpClient;
-use bundle\http\HttpResponse;
 use ide\Logger;
 use php\util\Flow;
 use shop\dto\Bundle;
+use shop\Http;
 
 class GithubProvider extends BaseBundleProvider
 {
@@ -21,20 +19,19 @@ class GithubProvider extends BaseBundleProvider
 
     public function init()
     {
-        Logger::error(class_exists(HttpClientBundle::class));
-
         $this->update();
     }
 
     public function update()
     {
-        Logger::info("send http request " . $this->urlBundleList);
-        $response = json_decode(file_get_contents($this->urlBundleList), true); // $this->http->get($this->urlBundleList);
+        try {
+            $this->list = Flow::of(Http::get($this->urlBundleList, "json"))->map(function ($item) {
+                return Bundle::of($item);
+            })->toArray();
+        } catch (\Exception $exception) {
+            Logger::error($exception->getMessage());
+        }
 
-        $this->list = Flow::of($response)->map(function ($item) {
-            return Bundle::of($item);
-        })->toArray();
+        return $this->list;
     }
-
-
 }

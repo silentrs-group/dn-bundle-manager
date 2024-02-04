@@ -17,6 +17,7 @@ use php\lib\fs;
 use php\lib\str;
 use php\util\Configuration;
 use php\util\Regex;
+use shop\Http;
 use shop\ui\UIActionButton;
 use gui;
 use shop\ui\UIBundleItem;
@@ -39,10 +40,9 @@ class BundleOperation
         $file = Ide::get()->createTempFile('.dnbundle');
 
         $node->showProgress();
-        //Ide::get()->getMainForm()->showPreloader('Подождите, загрузка пакета ...');
 
         Ide::async(function () use ($url, $file, $node) {
-            if (!$this->download($url, $file)) return;
+            if (!$this->download($url, $file, $node)) return;
 
             $this->addBundle($file, function () use ($file, $node) {
                 $this->successBundleInstall($file, $node);
@@ -97,10 +97,9 @@ class BundleOperation
         $file = Ide::get()->createTempFile('.dnbundle');
 
         $node->showProgress();
-        // Ide::get()->getMainForm()->showPreloader('Подождите, загрузка пакета ...');
 
         Ide::async(function () use ($url, $file, $node, $bundle) {
-            if (!$this->download($url, $file)) return;
+            if (!$this->download($url, $file, $node)) return;
 
             $this->remove($bundle);
 
@@ -217,18 +216,19 @@ class BundleOperation
      */
     private function download($url, File $file, UIBundleItem $node = null): bool
     {
-        $memory = new MemoryStream();
-        $memory->write(file_get_contents($url));
+        try {
+            $memory = Http::get($url, "stream");
 
-        if ($memory->length() < 1) {
-            uiLater(function () use ($node) {
-                UXDialog::show('Ошибка загрузки пакета');
-                $node->hideProgress();
-            });
-            return false;
+            if ($memory instanceof Stream && $memory->length() < 1) {
+                uiLater(function () use ($node) {
+                    UXDialog::show('Ошибка загрузки пакета');
+                    $node->hideProgress();
+                });
+                return false;
+            }
+        } catch (\Exception $exception) {
+            $node->hideProgress();
         }
-
-        $memory->seek(0);
 
         FileUtils::copyFile($memory, $file);
 

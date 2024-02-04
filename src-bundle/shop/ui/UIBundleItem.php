@@ -10,6 +10,7 @@ use php\io\Stream;
 use php\lang\Thread;
 use php\lib\fs;
 use php\lib\str;
+use shop\Http;
 use std;
 use gui;
 
@@ -107,10 +108,15 @@ class UIBundleItem
 
         $infoContainer->paddingLeft = 10;
 
-        $infoContainer->add(new UXHBox([
-            $this->makeName(),
-            $this->actionButton->getNode()
+        $infoContainer->add($header = new UXHBox([
+            $l1 = new UXHbox([$this->makeName(), $o = new UXLabelEx(" ("), $this->makeVersion(), $c = new UXLabelEx(")")]),
+            new UXHbox([$this->actionButton->getNode()])
         ]));
+
+        $o->textColor = $c->textColor = "darkgray";
+        $header->minWidth = 240;
+        $header->maxWidth = 240;
+        $l1->minWidth = 215;
 
 
         if ($this->state == UIActionButton::STATE_UNINSTALL) {
@@ -131,7 +137,7 @@ class UIBundleItem
         $infoContainer->add($subInfoContainer = new UXHBox());
 
         $subInfoContainer->add($this->makeAuthor());
-        $subInfoContainer->add($this->makeVersion());
+
         $this->makeProgress();
     }
 
@@ -154,8 +160,7 @@ class UIBundleItem
     private function makeName(): UXLabelEx
     {
         $this->name = new UXLabelEx();
-        $this->name->minWidth =
-        $this->name->maxWidth = 216;
+        $this->name->maxWidth = 160;
         $this->name->font->bold = true;
 
         return $this->name;
@@ -165,6 +170,7 @@ class UIBundleItem
     {
         $this->description = new UXLabelEx();
         $this->description->textColor = 'gray';
+        $this->description->maxWidth = 220;
 
         return $this->description;
     }
@@ -181,7 +187,7 @@ class UIBundleItem
     private function makeVersion(): UXLabelEx
     {
         $this->version = new UXLabelEx();
-        $this->version->minWidth = 60;
+        $this->version->autoSize = true;
         $this->version->textColor = 'lightgray';
 
         return $this->version;
@@ -213,11 +219,8 @@ class UIBundleItem
 
         if (str::startsWith($path, "http")) {
             $th = new Thread(function () use ($path) {
-                $memory = new MemoryStream();
-                $memory->write(file_get_contents($path));
-
-                if ($memory->length() > 0) {
-                    $memory->seek(0);
+                $memory = Http::get($path, "stream");
+                if ($memory instanceof Stream) {
                     fs::copy($memory, Ide::get()->getUserHome() . '\bundleManager\\' . md5($path));
 
                     uiLater(function () use ($path) {
@@ -269,7 +272,7 @@ class UIBundleItem
 
     public function setVersion($value)
     {
-        $this->version->text = "ver: " . $value;
+        $this->version->text = "ver: " . trim($value);
     }
 
 
