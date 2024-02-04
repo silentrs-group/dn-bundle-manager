@@ -19,15 +19,13 @@ class GithubProvider extends BaseBundleProvider
 
     public function init()
     {
-        $this->update();
+
     }
 
     public function update()
     {
         try {
-            $this->list = Flow::of(Http::get($this->urlBundleList, "json"))->map(function ($item) {
-                return Bundle::of($item);
-            })->toArray();
+            $this->list = Http::get($this->urlBundleList, "json");
         } catch (\Exception $exception) {
             Logger::error($exception->getMessage());
         }
