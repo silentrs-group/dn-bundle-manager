@@ -1,32 +1,52 @@
 /* JavaFX CSS Style with -fx- prefix */
 
 * {
-    -main-color: #15111d;
-    -button-color: skyblue;
+    -form-background: #f3f3f3;
+    -background-color: lightgray;
+
+    -foreground-color: #FFFFFF;
+    -border-color: lightgray;
+    -text-color: #444444;
+
     -tooltip-color: rgba(56, 56, 56, 0.4);
 }
 
+.form,
+.scroll-pane .viewport {
+    -fx-background-color: -form-background;
+}
+
 .search {
-    -fx-border-color: lightgray;
+    -fx-border-color: -border-color;
     -fx-border-radius: 5;
     -fx-background-radius: 5;
-    -fx-background-color: white;
+    -fx-background-color: -foreground-color;
+
+    -fx-background-image: url("../img/search.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: 9 8;
+    -fx-padding: 0 0 0 30;
+    -fx-text-fill: -text-color;
 }
 
 .search:focused {
-    -fx-effect: dropshadow(one-pass-box, #0000000F, 25, 0.2, 0, 5);
+    -fx-effect: dropshadow(one-pass-box, -background-color, 25, 0.2, 0, 5);
 }
 
 .listitem {
     -fx-border-radius: 5;
     -fx-background-radius: 5;
-    -fx-background-color: #FFFFFF;
+    -fx-background-color: -foreground-color;
     -fx-border-width: 1;
-    -fx-border-color: lightgray;
+    -fx-border-color: -border-color;
 }
 
 .listitem:hover {
-    -fx-effect: dropshadow(one-pass-box, #0000000F, 25, 0.2, 0, 5);
+    -fx-effect: dropshadow(one-pass-box, -background-color, 25, 0.2, 0, 5);
+}
+
+.listitem .name {
+    -fx-text-fill: -text-color;
 }
 
 .installed {
@@ -50,19 +70,24 @@
 
 .nav .nav-item {
     -fx-background-insets: 0, 1;
-    -fx-background-color: lightgray, #FAFAFA;
+    -fx-background-color: -background-color, -foreground-color;
     -fx-min-width: 30;
     -fx-min-height: 30;
 }
 
 .nav .selected {
     -fx-background-insets: 0;
-    -fx-background-color: white;
-    -fx-text-fill: black;
+    -fx-background-color: -foreground-color;
+    -fx-text-fill: -text-color;
     
     -fx-border-radius: 3;
     -fx-background-radius: 3;
     -fx-font-weight: bold;
+}
+
+.tooltip {
+    -fx-padding: 0;
+    -fx-background-color: transparent !important;
 }
 
 .arrow-toltip {
@@ -78,6 +103,10 @@
     -fx-padding: 5 10;
     -fx-border-radius: 5;
     -fx-background-radius: 5;
+}
+
+.toggle-theme {
+    -fx-text-fill: -text-color;
 }
 
 

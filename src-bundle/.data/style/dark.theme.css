@@ -1,0 +1,10 @@
+* {
+    -form-background: #2c2c34;
+    -background-color: derive(-form-background, -30%);
+
+    -foreground-color: rgba(0, 0, 0, 0.1);
+    -border-color: #232323;
+    -text-color: #aeaeae;
+
+    -tooltip-color: rgba(56, 56, 56, 0.4);
+}

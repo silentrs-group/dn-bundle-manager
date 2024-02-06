@@ -1,6 +1,6 @@
 <?php
 
-namespace shop;
+namespace shop\internal;
 
 use ide\Logger;
 use php\lib\str;

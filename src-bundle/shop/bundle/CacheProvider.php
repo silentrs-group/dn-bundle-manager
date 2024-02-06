@@ -4,12 +4,10 @@ namespace shop\bundle;
 
 use ide\commands\BundleManagerCommand;
 use ide\Ide;
-use ide\Logger;
-use php\io\FileStream;
 use php\lib\str;
 use php\util\Flow;
-use shop\Cache;
 use shop\dto\Bundle;
+use shop\internal\Cache;
 
 class CacheProvider extends BaseBundleProvider
 {

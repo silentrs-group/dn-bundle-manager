@@ -4,12 +4,14 @@ namespace shop;
 
 use ide\commands\BundleManagerCommand;
 use ide\Ide;
+use php\io\IOException;
 use php\io\MemoryStream;
 use php\lib\fs;
 use shop\dto\Bundle;
 use shop\bundle\CacheProvider;
 use shop\bundle\GithubProvider;
 use shop\bundle\LocalProvider;
+use shop\internal\Cache;
 
 class BundleService
 {
@@ -74,12 +76,12 @@ class BundleService
         $this->github->updateBundle($url, $name, $node);
     }
 
+    /**
+     * @throws IOException
+     */
     public function loadFromCache($image)
     {
-        $memory = new MemoryStream();
-        $memory->write(file_get_contents(Ide::get()->getUserHome() . BundleManagerCommand::CACHE_DIR . '\\' . md5($image)));
-        $memory->seek(0);
-        return $memory;
+        return Cache::get(Ide::get()->getUserHome() . BundleManagerCommand::CACHE_DIR . '\\' . md5($image));
     }
 
     public function has($image)

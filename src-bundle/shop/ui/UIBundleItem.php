@@ -3,16 +3,15 @@
 namespace shop\ui;
 
 use framework;
+use gui;
 use ide\Ide;
 use ide\Logger;
-use php\io\MemoryStream;
 use php\io\Stream;
 use php\lang\Thread;
 use php\lib\fs;
 use php\lib\str;
-use shop\Http;
+use shop\internal\Http;
 use std;
-use gui;
 
 class UIBundleItem
 {
@@ -147,7 +146,7 @@ class UIBundleItem
         $this->icon->smooth = true;
         $this->icon->width = $this->iconSize[0];
         $this->icon->height = $this->iconSize[1];
-        $this->icon->backgroundColor = '#0000000F';
+        $this->icon->backgroundColor = '#e3e3e3';
 
         $this->icon->clip = new UXCircle();
         $this->icon->clip->width = $this->iconSize[0];
@@ -160,6 +159,7 @@ class UIBundleItem
     private function makeName(): UXLabelEx
     {
         $this->name = new UXLabelEx();
+        $this->name->classes->add("name");
         $this->name->maxWidth = 160;
         $this->name->font->bold = true;
 
@@ -257,7 +257,7 @@ class UIBundleItem
                 $x = -(($width - 220) / 2);
             }
 
-            $this->tool->showByNode($e->sender, $x, 12);
+            $this->tool->showByNode($e->sender, $x, 14);
         });
 
         $this->description->on("mouseExit", function () {

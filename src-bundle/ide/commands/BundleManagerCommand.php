@@ -10,6 +10,7 @@ use php\gui\UXForm;
 use php\gui\layout\UXTilePane;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXScrollPane;
+use php\io\IOException;
 use php\lang\Thread;
 use php\lib\str;
 use shop\BundleService;
@@ -27,8 +28,6 @@ class BundleManagerCommand extends AbstractCommand
      * @var UIShop
      */
     private $form;
-    private $container;
-    private $installedBundleList = [];
 
     /**
      * @var BundleService
@@ -118,6 +117,7 @@ class BundleManagerCommand extends AbstractCommand
      * @param Bundle $bundle
      * @param UIBundleItem $node
      * @return void
+     * @throws IOException
      */
     private function setIcon(Bundle $bundle, UIBundleItem $node): void
     {

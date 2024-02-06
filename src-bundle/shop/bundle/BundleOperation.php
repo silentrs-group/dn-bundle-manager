@@ -2,7 +2,7 @@
 
 namespace shop\bundle;
 
-use bundle\http\HttpClient;
+use gui;
 use ide\formats\ProjectFormat;
 use ide\Ide;
 use ide\project\behaviours\bundle\BundlesProjectControlPane;
@@ -17,11 +17,9 @@ use php\lib\fs;
 use php\lib\str;
 use php\util\Configuration;
 use php\util\Regex;
-use shop\Http;
+use shop\internal\Http;
 use shop\ui\UIActionButton;
-use gui;
 use shop\ui\UIBundleItem;
-use shop\ui\UIShop;
 
 class BundleOperation
 {

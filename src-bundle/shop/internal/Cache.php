@@ -1,16 +1,26 @@
 <?php
 
-namespace shop;
+namespace shop\internal;
 
 use php\io\FileStream;
+use php\io\IOException;
 use php\lib\fs;
+use php\lib\str;
 use php\time\Time;
 
 class Cache
 {
     public static $path;
 
-    public static function make ($file, $data, $isPermanent = true, $time = 0)
+    /**
+     * @param string $file
+     * @param string $data
+     * @param bool $isPermanent
+     * @param int $time
+     * @return void
+     * @throws IOException
+     */
+    public static function make(string $file, string $data, bool $isPermanent = true, int $time = 0)
     {
         $file = new FileStream($file, "w");
 
@@ -23,9 +33,12 @@ class Cache
     }
 
     /**
-     * @return mixed|false
+     * @param string $file
+     * @param bool $isPermanent
+     * @return mixed|false|FileStream
+     * @throws IOException
      */
-    public static function get ($file, $isPermanent = true)
+    public static function get(string $file, bool $isPermanent = true)
     {
         if (!fs::exists($file)) return false;
 
@@ -36,7 +49,7 @@ class Cache
 
             $time = base_convert($file->read(13), 10, 10) - Time::now()->getTime();
 
-            if ($time  <= 0) {
+            if ($time <= 0) {
                 return false;
             }
 
@@ -45,8 +58,6 @@ class Cache
             return $data;
         }
 
-        $data = $file->readFully();
-        $file->close();
-        return $data;
+        return $file;
     }
 }

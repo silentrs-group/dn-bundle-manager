@@ -3,9 +3,7 @@
 namespace shop\bundle;
 
 use ide\Logger;
-use php\util\Flow;
-use shop\dto\Bundle;
-use shop\Http;
+use shop\internal\Http;
 
 class GithubProvider extends BaseBundleProvider
 {
