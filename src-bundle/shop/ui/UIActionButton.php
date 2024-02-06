@@ -73,7 +73,6 @@ class UIActionButton
         $this->container->classes->add($img);
         foreach ($this->container->classes as $class) {
             if ($class == $img || $class == "action-button" || $class == "button") continue;
-            Logger::warn("remove class: " . $class);
             $this->container->classes->remove($class);
         }
     }

@@ -6,6 +6,7 @@ use gui;
 use ide\formats\ProjectFormat;
 use ide\Ide;
 use ide\project\behaviours\bundle\BundlesProjectControlPane;
+use ide\systems\IdeSystem;
 use ide\utils\FileUtils;
 use php\compress\ZipFile;
 use php\io\File;
@@ -107,6 +108,7 @@ class BundleOperation
 
             uiLater(function () use ($node) {
                 Ide::get()->getLibrary()->updateCategory('bundles');
+                IdeSystem::getLoader()->invalidateByteCodeCache();
                 $node->hideProgress();
             });
         });
