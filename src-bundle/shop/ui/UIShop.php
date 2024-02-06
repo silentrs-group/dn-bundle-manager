@@ -182,17 +182,15 @@ class UIShop
         $themeToggle = new UXCheckbox("Использовать темную тему");
         $themeToggle->selected = $this->getConfig()->get("theme", "light") !== "light";
         $themeToggle->classes->add("toggle-theme");
-        $themeToggle->bottomAnchor = 5;
+        $themeToggle->bottomAnchor = 10;
         $themeToggle->leftAnchor = 5;
         $themeToggle->observer("selected")->addListener(function ($o, $n) {
             $this->getConfig()->set("theme", $n ? "dark" : "light");
             $this->getConfig()->save($this->configFile);
 
             if ($n) {
-                Logger::info("add dark theme");
                 $this->container->addStylesheet((new ResourceStream('.data/style/dark.theme.css'))->toExternalForm());
             } else {
-                Logger::info("remove dark theme");
                 $this->container->removeStylesheet((new ResourceStream('.data/style/dark.theme.css'))->toExternalForm());
             }
         });

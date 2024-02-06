@@ -73,6 +73,7 @@
     -fx-background-color: -background-color, -foreground-color;
     -fx-min-width: 30;
     -fx-min-height: 30;
+    -fx-text-fill: -text-color;
 }
 
 .nav .selected {
@@ -107,6 +108,11 @@
 
 .toggle-theme {
     -fx-text-fill: -text-color;
+}
+
+.toggle-theme .box {
+    -fx-background-color: -background-color;
+    -fx-border-color: -border-color;
 }
 
 
