@@ -50,6 +50,9 @@ class BundleManagerCommand extends AbstractCommand
         $this->form->show();
     }
 
+    /**
+     * @return UXButton
+     */
     public function makeUiForHead()
     {
         $this->form = new UIShop();
@@ -85,6 +88,7 @@ class BundleManagerCommand extends AbstractCommand
      * @param Bundle $bundle
      * @param $installList
      * @return void
+     * @throws IOException
      */
     function makeItem(Bundle $bundle, $installList): void
     {

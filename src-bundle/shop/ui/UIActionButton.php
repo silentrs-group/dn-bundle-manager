@@ -3,6 +3,7 @@ namespace shop\ui;
 
 use app;
 use gui;
+use ide\Logger;
 
 class UIActionButton 
 {
@@ -28,14 +29,11 @@ class UIActionButton
     private function make ()
     {
         $this->container = new UXButton();
-        $this->container->style = '-fx-padding: 0; -fx-background-color: transparent; -fx-border-width: 0;';
+        $this->container->classes->add("action-button");
         $this->container->maxWidth =
         $this->container->minWidth =
         $this->container->maxHeight =
         $this->container->minHeight = 16;
-        $this->container->graphic = new UXImageArea(new UXImage('res://.data/img/close.png', 16, 16));
-        $this->container->graphic->width = 16;
-        $this->container->graphic->height = 16;
         $this->container->opacity = 0.5;
         
         $this->container->on("mouseEnter", function () {
@@ -66,14 +64,18 @@ class UIActionButton
         $this->state = $value;
         
         switch ($this->state) {
-            case UIActionButton::STATE_INSTALL:    $img = 'res://.data/img/download.png';  break;
-            case UIActionButton::STATE_UNINSTALL:  $img = 'res://.data/img/close.png';     break;
-            case UIActionButton::STATE_UPDATE:     $img = 'res://.data/img/update.png';    break;
-            default:                               $img = 'res://.data/img/undefined.png';
+            case UIActionButton::STATE_INSTALL:    $img = 'install';   break;
+            case UIActionButton::STATE_UNINSTALL:  $img = 'uninstall'; break;
+            case UIActionButton::STATE_UPDATE:     $img = 'update';    break;
+            default:                               $img = 'undefined';
         }
-        
-        
-        $this->container->graphic->image = new UXImage($img, 16, 16);
+
+        $this->container->classes->add($img);
+        foreach ($this->container->classes as $class) {
+            if ($class == $img || $class == "action-button" || $class == "button") continue;
+            Logger::warn("remove class: " . $class);
+            $this->container->classes->remove($class);
+        }
     }
     
     public function getNode ()

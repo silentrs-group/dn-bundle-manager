@@ -49,8 +49,28 @@
     -fx-text-fill: -text-color;
 }
 
-.installed {
-    -fx-border-color: #49c969;
+.listitem .action-button {
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+
+    -fx-background-size: 16 16;
+}
+
+.install {
+    -fx-background-image: url("../img/download.png");
+}
+
+.uninstall {
+    -fx-background-image: url("../img/close.png");
+}
+
+.update {
+    -fx-background-image: url("../img/update.png");
+}
+
+.undefined {
+    -fx-background-image: url("../img/undefined.png");
 }
 
 .scroll-pane, .scroll-pane .viewport {

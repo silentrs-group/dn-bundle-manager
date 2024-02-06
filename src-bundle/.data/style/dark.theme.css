@@ -8,3 +8,19 @@
 
     -tooltip-color: rgba(56, 56, 56, 0.4);
 }
+
+.install {
+    -fx-background-image: url("../img/download_w.png");
+}
+
+.uninstall {
+    -fx-background-image: url("../img/close_w.png");
+}
+
+.update {
+    -fx-background-image: url("../img/update_w.png");
+}
+
+.undefined {
+    -fx-background-image: url("../img/undefined_w.png");
+}

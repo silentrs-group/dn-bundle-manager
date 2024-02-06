@@ -7,7 +7,7 @@ use shop\internal\Http;
 
 class GithubProvider extends BaseBundleProvider
 {
-    private $urlBundleList = 'https://raw.githubusercontent.com/silentrs-group/dn-bundles/main/bundle-list.json';
+    const BASE_HOST = 'https://raw.githubusercontent.com/silentrs-group/dn-bundles/main/';
 
     /**
      * @var HttpClient
@@ -23,7 +23,7 @@ class GithubProvider extends BaseBundleProvider
     public function update()
     {
         try {
-            $this->list = Http::get($this->urlBundleList, "json");
+            $this->list = Http::get(self::BASE_HOST . 'bundle-list-v2.json', "json");
         } catch (\Exception $exception) {
             Logger::error($exception->getMessage());
         }

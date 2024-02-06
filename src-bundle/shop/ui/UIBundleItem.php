@@ -216,8 +216,7 @@ class UIBundleItem
             return;
         }
 
-
-        if (str::startsWith($path, "http")) {
+        if (str::startsWith($path, "http") && str::endsWith($path, "png")) {
             $th = new Thread(function () use ($path) {
                 $memory = Http::get($path, "stream");
                 if ($memory instanceof Stream) {

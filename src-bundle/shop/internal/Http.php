@@ -15,13 +15,13 @@ class Http
 
         $connection = URLConnection::create($url);
 
-        $connection->setRequestProperty("User-Agent", "Bundle Manager");
-        $connection->setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-        $connection->setRequestProperty("Referer", "http://internal.stat/");
+        $connection->setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0");
+        $connection->setRequestProperty("Content-Type", "*/*; charset=UTF-8");
+        $connection->setRequestProperty("Referer", "https://internal.loc/req");
 
         try {
             if ($connection->responseCode != 200) {
-                Logger::error(sprintf("Message: %s; code: %s;", $connection->responseMessage, $connection->responseCode));
+                Logger::error(sprintf("Message: %s; code: %s; url: %s;", $connection->responseMessage, $connection->responseCode, $url));
                 return null;
             }
 
