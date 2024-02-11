@@ -12,15 +12,16 @@ class UIActionButton
     const STATE_UPDATE      = 0b100;
     const STATE_UNDEFINED   = 0;
     
-    private $container;
+    protected $container;
     
     /**
      * @var int
      */
-    private $state = 0;
+    protected $state = 0;
     
-    private $actionList = [];
-    
+    protected $actionList = [];
+    protected $classContainer = "action-button";
+
     public function __construct ()
     {
         $this->make();
@@ -29,7 +30,7 @@ class UIActionButton
     private function make ()
     {
         $this->container = new UXButton();
-        $this->container->classes->add("action-button");
+        $this->container->classes->add($this->classContainer);
         $this->container->maxWidth =
         $this->container->minWidth =
         $this->container->maxHeight =

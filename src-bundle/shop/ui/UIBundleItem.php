@@ -53,6 +53,11 @@ class UIBundleItem
     private $actionButton;
 
     /**
+     * @var UIProjectExampleButton
+     */
+    private $projectExampleButton;
+
+    /**
      * @var UXProgressIndicator
      */
     private $progress;
@@ -72,6 +77,12 @@ class UIBundleItem
      */
     private $state = 0;
 
+    private $containerMaxWidth = 290;
+    /**
+     * @var mixed
+     */
+    private $exampleUrl;
+
 
     public function __construct()
     {
@@ -81,10 +92,11 @@ class UIBundleItem
     private function make()
     {
         $this->actionButton = new UIActionButton();
+        $this->makeProjectExampleButton();
 
         $this->container = new UXStackPane();
         $this->container->minWidth = $this->containerWidth;
-        $this->container->maxWidth = 290;
+        $this->container->maxWidth = $this->containerMaxWidth;
 
         $this->baseContainer = new UXHBox();
 
@@ -94,7 +106,7 @@ class UIBundleItem
         $this->baseContainer->minWidth = $this->containerWidth;
         $this->baseContainer->padding = 5;
         $this->baseContainer->paddingLeft = 10;
-        $this->baseContainer->maxWidth = 290;
+        $this->baseContainer->maxWidth = $this->containerMaxWidth;
         $this->baseContainer->leftAnchor =
         $this->baseContainer->topAnchor =
         $this->baseContainer->rightAnchor =
@@ -106,11 +118,17 @@ class UIBundleItem
         $this->baseContainer->add($infoContainer = new UXVBox());
 
         $infoContainer->paddingLeft = 10;
+        $infoContainer->minWidth = $this->containerWidth;
+        $infoContainer->maxWidth = $this->containerMaxWidth;
+        $infoContainer->width = 100;
 
         $infoContainer->add($header = new UXHBox([
-            $l1 = new UXHbox([$this->makeName(), $o = new UXLabelEx(" ("), $this->makeVersion(), $c = new UXLabelEx(")")]),
-            new UXHbox([$this->actionButton->getNode()])
+            $l1 = new UXHbox([$this->makeName(), $o = new UXLabelEx(" ("), $this->makeVersion(), $c = new UXLabelEx(")")])
         ]));
+
+        $this->baseContainer->add($buttonsList = new UXVbox([$this->actionButton->getNode(), $this->projectExampleButton->getNode()]));
+
+        $buttonsList->spacing = 5;
 
         $o->textColor = $c->textColor = "darkgray";
         $header->minWidth = 240;
@@ -196,6 +214,14 @@ class UIBundleItem
     public function setActionButton($state, $callback)
     {
         $this->actionButton->setAction($state, $callback);
+    }
+
+    public function setUrlExample($url)
+    {
+        if (!str::startsWith($url, "http")) return;
+
+        $this->exampleUrl = $url;
+        $this->projectExampleButton->getNode()->visible = true;
     }
 
     public function getNode(): UXStackPane
@@ -329,6 +355,21 @@ class UIBundleItem
             $this->baseContainer->enabled = true;
             $this->progress->visible = false;
         });
+    }
+
+    /**
+     * @return void
+     */
+    public function makeProjectExampleButton(): void
+    {
+        $this->projectExampleButton = new UIProjectExampleButton();
+        $this->projectExampleButton->setAction(UIActionButton::STATE_UNDEFINED, function () {
+            if (str::startsWith($this->exampleUrl, "http")) {
+                browse($this->exampleUrl);
+            }
+        });
+
+        $this->projectExampleButton->getNode()->visible = false;
     }
 
 

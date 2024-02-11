@@ -57,6 +57,15 @@
     -fx-background-size: 16 16;
 }
 
+.listitem .example-action-button {
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+
+    -fx-background-size: 16 16;
+    -fx-background-image: url("../img/undefined.png");
+}
+
 .install {
     -fx-background-image: url("../img/download.png");
 }

@@ -101,6 +101,7 @@ class BundleManagerCommand extends AbstractCommand
         $this->setIcon($bundle, $node);
         $node->setVersion($bundle->version);
         $this->setState($bundle, $node, $installList);
+        $node->setUrlExample($bundle->exampleUrl);
 
         $node->setActionButton(UIActionButton::STATE_INSTALL, function () use ($bundle, $node) {
             $this->service->install($bundle->url, $node);

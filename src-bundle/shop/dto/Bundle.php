@@ -14,6 +14,7 @@ class Bundle
     public $version;
     public $url;
     public $description;
+    public $exampleUrl;
 
     public static function of($data)
     {
@@ -40,5 +41,6 @@ class Bundle
         }
 
         $this->description = $data["description"];
+        $this->exampleUrl = $data["exampleUrl"];
     }
 }

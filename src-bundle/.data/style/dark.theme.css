@@ -24,3 +24,7 @@
 .undefined {
     -fx-background-image: url("../img/undefined_w.png");
 }
+
+.listitem .example-action-button {
+    -fx-background-image: url("../img/undefined_w.png");
+}
