@@ -43,4 +43,60 @@ class Http
 
         return null;
     }
+
+    public static function post($url, $data, $responseType = "")
+    {
+        $connection = URLConnection::create($url);
+
+        $connection->setRequestProperty('Content-Type', "application/json; charset=UTF-8");
+        $connection->requestMethod = 'POST';
+
+        $data = json_encode($data);
+        $connection->setRequestProperty('Content-Length', str::length($data));
+        $connection->getOutputStream()->write($data);
+
+        $connection->connect();
+
+        try {
+            if ($connection->responseCode != 204) {
+                Logger::error(sprintf("Message: %s; code: %s; url: %s;", $connection->responseMessage, $connection->responseCode, $url));
+                return null;
+            }
+            switch (str::lower($responseType)) {
+                case 'json':
+                    return json_decode($connection->getInputStream()->readFully(), true);
+
+                case 'stream':
+                    return $connection->getInputStream();
+
+                default:
+                    return $connection->getInputStream()->readFully();
+            }
+        } catch (\Exception $exception) {
+            Logger::error($exception->getMessage() . '::' . $exception->getLine());
+            throw new SocketException($exception->getMessage());
+        }
+
+        return null;
+    }
+
+
+    private static function formatUrlencode(array $data, $prefix = '')
+    {
+        $str = [];
+
+        foreach ($data as $code => $value) {
+            if (is_array($value)) {
+                $str[] = self::formatUrlencode($value, $prefix ? "{$prefix}[$code]" : $code);
+            } else {
+                if ($prefix) {
+                    $str[] = "{$prefix}[$code]=" . urlencode($value);
+                } else {
+                    $str[] = "$code=" . urlencode($value);
+                }
+            }
+        }
+
+        return str::join($str, '&');
+    }
 }

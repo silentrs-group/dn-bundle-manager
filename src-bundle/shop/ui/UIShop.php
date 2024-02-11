@@ -2,6 +2,7 @@
 
 namespace shop\ui;
 
+use develnext\bundle\bundlemanager\BundleManageBundle;
 use framework;
 use gui;
 use ide\Ide;
@@ -12,6 +13,7 @@ use php\io\ResourceStream;
 use php\lib\fs;
 use php\lib\str;
 use php\util\Configuration;
+use shop\internal\LoggerReporter\LoggerReporter;
 
 class UIShop
 {
@@ -69,6 +71,14 @@ class UIShop
 
         if ($config->get("theme", "light") !== "light") {
             $this->container->addStylesheet((new ResourceStream('.data/style/dark.theme.css'))->toExternalForm());
+        }
+
+        if ($config->get("f_r", 0) == 0) {
+            try {
+                BundleManageBundle::$loggerReporter->discord("installed", LoggerReporter::INFO)->send();
+            } catch (\Exception $ignore) {}
+            $config->set("f_r", 1);
+            $config->save($this->configFile);
         }
 
         $this->container->layout = new UXAnchorPane();

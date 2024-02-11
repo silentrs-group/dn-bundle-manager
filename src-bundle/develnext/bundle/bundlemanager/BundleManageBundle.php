@@ -15,10 +15,16 @@ use php\gui\UXButton;
 use php\lib\fs;
 use php\time\Timer;
 use gui;
+use shop\internal\LoggerReporter\LoggerReporter;
 
 class BundleManageBundle extends AbstractJarBundle
 {
     private static $command = null;
+
+    /**
+     * @var LoggerReporter
+     */
+    public static $loggerReporter;
 
     public function onRegister(IdeLibraryBundleResource $resource)
     {
@@ -29,6 +35,7 @@ class BundleManageBundle extends AbstractJarBundle
         fs::makeDir(Ide::get()->getUserHome() . BundleManagerCommand::CACHE_DIR);
 
         self::$command = $test = new BundleManagerCommand();
+        self::$loggerReporter = new LoggerReporter();
 
         if (Ide::get()->getMainForm()->getHeadPane()->children->offsetGet(0) instanceof UXButton::class) {
             if (Ide::get()->getMainForm()->getHeadPane()->children->offsetGet(0)->text == $test->makeUiForHead()->text) return;

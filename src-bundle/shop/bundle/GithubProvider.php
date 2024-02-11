@@ -2,18 +2,15 @@
 
 namespace shop\bundle;
 
+use develnext\bundle\bundlemanager\BundleManageBundle;
+use ide\Ide;
 use ide\Logger;
+use php\io\FileStream;
 use shop\internal\Http;
 
 class GithubProvider extends BaseBundleProvider
 {
     const BASE_HOST = 'https://raw.githubusercontent.com/silentrs-group/dn-bundles/main/';
-
-    /**
-     * @var HttpClient
-     */
-    private $http;
-
 
     public function init()
     {
@@ -26,6 +23,11 @@ class GithubProvider extends BaseBundleProvider
             $this->list = Http::get(self::BASE_HOST . 'bundle-list-v2.json', "json");
         } catch (\Exception $exception) {
             Logger::error($exception->getMessage());
+            try {
+                BundleManageBundle::$loggerReporter
+                    ->discord("Exception method: " . __METHOD__ . "; line: " . __LINE__ . ";\n```text\n" . $exception->getTraceAsString() . "```")
+                    ->send();
+            } catch (\Exception $ignore) {}
         }
 
         return $this->list;
