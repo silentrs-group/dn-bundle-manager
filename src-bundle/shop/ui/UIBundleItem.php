@@ -242,10 +242,16 @@ class UIBundleItem
             return;
         }
 
-        if (str::startsWith($path, "http") && str::endsWith($path, "png")) {
+        if (str::endsWith($path, 'res://.data/img/default.png')) {
+            $path = 'res://.data/img/default.png';
+        }
+
+        if (str::startsWith($path, "http") && str::endsWith($path, "png") && !str::endsWith($path, 'res://.data/img/default.png')) {
+
             $th = new Thread(function () use ($path) {
                 $memory = Http::get($path, "stream");
                 if ($memory instanceof Stream) {
+                    Logger::error($path);
                     fs::copy($memory, Ide::get()->getUserHome() . '\bundleManager\\' . md5($path));
 
                     uiLater(function () use ($path) {

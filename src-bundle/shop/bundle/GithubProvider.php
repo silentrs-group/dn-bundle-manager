@@ -3,9 +3,7 @@
 namespace shop\bundle;
 
 use develnext\bundle\bundlemanager\BundleManageBundle;
-use ide\Ide;
 use ide\Logger;
-use php\io\FileStream;
 use shop\internal\Http;
 
 class GithubProvider extends BaseBundleProvider

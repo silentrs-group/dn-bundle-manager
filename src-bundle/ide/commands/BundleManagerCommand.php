@@ -3,7 +3,6 @@
 namespace ide\commands;
 
 use ide\editors\AbstractEditor;
-use ide\Logger;
 use ide\misc\AbstractCommand;
 use php\gui\UXButton;
 use php\gui\UXForm;

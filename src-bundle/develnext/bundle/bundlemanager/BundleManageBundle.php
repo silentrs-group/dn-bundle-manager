@@ -2,15 +2,12 @@
 
 namespace develnext\bundle\bundlemanager;
 
-use develnext\bundle\httpclient\HttpClientBundle;
 use ide\account\api\AccountService;
-use ide\bundle\AbstractBundle;
 use ide\bundle\AbstractJarBundle;
 use ide\commands\MyAccountCommand;
 use ide\commands\BundleManagerCommand;
 use ide\library\IdeLibraryBundleResource;
 use ide\Ide;
-use ide\Logger;
 use php\gui\UXButton;
 use php\lib\fs;
 use php\time\Timer;
@@ -52,12 +49,5 @@ class BundleManageBundle extends AbstractJarBundle
         }
 
         Ide::get()->getMainForm()->getHeadPane()->children->insert(0, $test->makeUiForHead());
-    }
-
-    public function getDependencies()
-    {
-        return [
-            HttpClientBundle::class
-        ];
     }
 }

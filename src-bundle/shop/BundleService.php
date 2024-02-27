@@ -5,7 +5,6 @@ namespace shop;
 use ide\commands\BundleManagerCommand;
 use ide\Ide;
 use php\io\IOException;
-use php\io\MemoryStream;
 use php\lib\fs;
 use shop\dto\Bundle;
 use shop\bundle\CacheProvider;
