@@ -97,6 +97,7 @@ class UIBundleItem
         $this->container = new UXStackPane();
         $this->container->minWidth = $this->containerWidth;
         $this->container->maxWidth = $this->containerMaxWidth;
+        $this->container->maxHeight = 60;
 
         $this->baseContainer = new UXHBox();
 

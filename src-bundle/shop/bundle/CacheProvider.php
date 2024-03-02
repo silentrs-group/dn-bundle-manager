@@ -2,8 +2,10 @@
 
 namespace shop\bundle;
 
+use http\Exception\RuntimeException;
 use ide\commands\BundleManagerCommand;
 use ide\Ide;
+use ide\Logger;
 use php\lib\str;
 use php\util\Flow;
 use shop\dto\Bundle;
@@ -49,15 +51,20 @@ class CacheProvider extends BaseBundleProvider
             $githubList = Cache::get($cache, false);
         }
 
+        $githubList = json_decode($githubList, true);
+
         if (!is_array($githubList)) {
-            $githubList = Flow::of(json_decode($githubList, true))->map(function ($item) {
-                return Bundle::of($item);
-            })->toArray();
-        } else {
-            $githubList = [];
+            throw new RuntimeException("Response data is broken");
         }
 
-        $this->list = Flow::of($this->mergeList($this->local->getList(), $githubList))->sort(function ($a, $b) {
+        $githubList["bundle"] = Flow::of($githubList["bundle"])->map([$this, 'sort'])->toArray();
+        $githubList["fonts"] = Flow::of($githubList["fonts"])->map([$this, 'sort'])->toArray();
+        $githubList["icons"] = Flow::of($githubList["icons"])->map([$this, 'sort'])->toArray();
+
+        $this->list = $githubList;
+
+        // merge and sort with local bundles, todo: i think need remove merge and keep only sorting
+        $this->list["bundle"] = Flow::of($this->mergeList($this->local->getList(), $githubList["bundle"]))->sort(function ($a, $b) {
             return str::compare(str::lower($a->name), str::lower($b->name));
         });
     }
@@ -93,5 +100,14 @@ class CacheProvider extends BaseBundleProvider
         return Flow::of($tempList)->sort(function ($a, $b) {
             return str::compare(str::lower($a->name), str::lower($b->name));
         });
+    }
+
+    /**
+     * @param $item
+     * @return Bundle
+     */
+    public function sort($item): Bundle
+    {
+        return Bundle::of($item);
     }
 }

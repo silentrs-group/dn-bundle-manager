@@ -14,6 +14,7 @@ use php\lib\fs;
 use php\lib\str;
 use php\util\Configuration;
 use shop\internal\LoggerReporter\LoggerReporter;
+use shop\ui\category\AbstractCategory;
 
 class UIShop
 {
@@ -49,6 +50,13 @@ class UIShop
      */
     private $configFile;
 
+    /**
+     * @var AbstractCategory[]
+     */
+    private $category = [];
+
+    private $index = 'bundle';
+
     public function __construct()
     {
         $this->configFile = Ide::get()->getUserHome() . '\\config\\' . UIShop::class . ".conf";
@@ -76,21 +84,42 @@ class UIShop
         if ($config->get("f_r", 0) == 0) {
             try {
                 BundleManageBundle::$loggerReporter->discord("installed", LoggerReporter::INFO)->send();
-            } catch (\Exception $ignore) {}
+            } catch (\Exception $ignore) {
+            }
             $config->set("f_r", 1);
             $config->save($this->configFile);
         }
 
         $this->container->layout = new UXAnchorPane();
+        $this->container->layout->leftAnchor =
+        $this->container->layout->topAnchor =
+        $this->container->layout->rightAnchor =
+        $this->container->layout->bottomAnchor = 0;
         $this->container->layout->classes->add("form");
         $this->container->width = $this->container->minWidth = $this->container->maxWidth = 930;
-        $this->container->height = $this->container->minHeight = $this->container->maxHeight = 520;
+        $this->container->height = $this->container->minHeight = $this->container->maxHeight = 580;
         $this->container->modality = 'APPLICATION_MODAL';
 
-        $this->container->add($this->makeListContainer());
-        $this->container->add($this->makePagination());
         $this->container->add($this->makeSearch());
 
+        $this->container->add($this->tab = new UXTabPane());
+
+        $this->tab->leftAnchor = 10;
+        $this->tab->rightAnchor = 10;
+        $this->tab->topAnchor = 65;
+        $this->tab->bottomAnchor = 80;
+        $this->tab->width = $this->tab->maxWidth = $this->container->width - ($this->tab->leftAnchor + $this->tab->rightAnchor);
+        $this->tab->height = 410;
+        $this->tab->on("click", function () {
+            if ($this->index != $this->tab->selectedTab->data("key")) {
+                $this->pagination->selectedPage = 0;
+            }
+
+            $this->index = $this->tab->selectedTab->data("key");
+            $this->updateList();
+        });
+
+        $this->container->add($this->makePagination());
         $this->container->add($this->makeDonate());
         $this->container->add($this->makeThemeToggle());
 
@@ -101,11 +130,9 @@ class UIShop
     {
         $bundleListContainer = new UXScrollPane(new UXAnchorPane);
         $bundleListContainer->leftAnchor =
-        $bundleListContainer->rightAnchor = 0;
-        $bundleListContainer->topAnchor = 65;
-        $bundleListContainer->bottomAnchor = 50;
-        $bundleListContainer->width = 930;
-        $bundleListContainer->height = 380;
+        $bundleListContainer->rightAnchor =
+        $bundleListContainer->topAnchor =
+        $bundleListContainer->bottomAnchor = 0;
         $bundleListContainer->fitToWidth = true;
         $bundleListContainer->fitToHeight = true;
         $bundleListContainer->scrollMaxX = 0;
@@ -115,6 +142,8 @@ class UIShop
         $bundleListContainer->content->topAnchor =
         $bundleListContainer->content->rightAnchor =
         $bundleListContainer->content->bottomAnchor = 0;
+
+        $bundleListContainer->content->backgroundColor = 'red';
 
         $bundleListContainer->vbarPolicy =
         $bundleListContainer->hbarPolicy = 'NEVER';
@@ -144,7 +173,7 @@ class UIShop
 
         $this->pagination->leftAnchor =
         $this->pagination->rightAnchor = 0;
-        $this->pagination->bottomAnchor = 20;
+        $this->pagination->bottomAnchor = 15;
 
         $this->pagination->classes->addAll(["nav", "pagination"]);
         $this->pagination->applyCss();
@@ -157,7 +186,7 @@ class UIShop
         return $this->pagination;
     }
 
-    public function makeSearch()
+    private function makeSearch()
     {
         $this->search = new UXTextField();
         $this->search->promptText = "Поиск...";
@@ -168,8 +197,37 @@ class UIShop
         $this->search->rightAnchor = 24;
         $this->search->minWidth = 500;
         $this->search->observer("text")->addListener(function ($o, $new) {
-            if ($new == "") $this->updateList();
-            else $this->updateList($new);
+            static $clear;
+
+            if ($clear == null) {
+                $clear = new UXButton();
+                $clear->style = '-fx-background-color: transparent; -fx-border-color: transparent;';
+                $clear->graphic = Ide::getImage('clear.png', [16, 16]);
+                $clear->rightAnchor = $this->search->rightAnchor;
+                $clear->y = $this->search->y;
+                $clear->height = $this->search->height;
+                $clear->width = 32;
+                $clear->on("click", function () {
+                    $this->search->text = "";
+                });
+
+                $this->container->add($clear);
+                $clear->hide();
+            }
+
+            foreach ($this->category as $category) {
+                if ($category->getTab() == $this->tab->selectedTab) {
+                    break;
+                }
+            }
+
+            if ($new == "") {
+                $this->updateList(null, $category);
+                $clear->hide();
+            } else {
+                $this->updateList($new, $category);
+                $clear->show();
+            }
         });
 
         return $this->search;
@@ -208,47 +266,66 @@ class UIShop
         return $themeToggle;
     }
 
-    public function updateList($search = false)
+    /**
+     * @param null $search
+     * @param AbstractCategory|null $category
+     * @return void
+     */
+    public function updateList($search = null, AbstractCategory $category = null)
     {
+        Logger::warn(__METHOD__);
         $startIndex = $this->pagination->selectedPage * $this->pagination->pageSize;
         $endIndex = $startIndex + $this->pagination->pageSize;
 
-        $this->bundleListContainer->children->clear();
+        foreach ($this->category as $_category) {
+            if ($_category->getKey() == $this->index) {
+                $category = $_category;
+                break;
+            }
+        }
+
+        if ($category == null) return;
+
+        $category->clear();
 
         if ($search) {
             /** @var UIBundleItem $item */
-            foreach ($this->list as $item) {
+            foreach ($this->list[$this->index] as $item) {
                 if (str::contains(str::lower($item->getName()), str::lower($search))) {
-                    $this->bundleListContainer->children->add($item->getNode());
+                    $category->setContent($item->getNode());
                 }
             }
+
+            $this->pagination->total = count($this->list[$this->index]);
 
             return;
         }
 
         for ($i = $startIndex; $i < $endIndex; $i++) {
-            if ($this->list[$i] !== null) {
-                $this->bundleListContainer->children->add($this->list[$i]->getNode());
+            if ($this->list[$this->index][$i] !== null) {
+                $category->setContent($this->list[$this->index][$i]->getNode());
                 continue;
             }
 
             break;
         }
+
+        $this->pagination->total = count($this->list[$this->index]);
     }
 
-    public function addItem(UIBundleItem $item)
+    public function addItem(UIBundleItem $item, AbstractCategory $category)
     {
-        $this->list[] = $item;
+        $this->list[$category->getKey()][] = $item;
 
-        $this->pagination->total = count($this->list);
+        $this->pagination->total = count($this->list[$category->getKey()]);
 
-        $this->updateList();
+        $this->updateList(false, $category);
     }
 
-    public function addAll($list)
+    public function addAll($list, $category)
     {
         foreach ($list as $item) {
-            $this->addItem($item);
+            $this->addItem($item, $category);
         }
     }
 
@@ -301,5 +378,19 @@ class UIShop
         }
 
         return $config;
+    }
+
+    public function registerCategory($class)
+    {
+        $this->category[$class] = new $class();
+        $this->tab->tabs->add($this->category[$class]->getTab());
+    }
+
+    /**
+     * @return AbstractCategory[]
+     */
+    public function getCategories(): array
+    {
+        return $this->category;
     }
 }

@@ -9,6 +9,9 @@
     -text-color: #444444;
 
     -tooltip-color: rgba(56, 56, 56, 0.4);
+
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
 }
 
 .form,
@@ -109,7 +112,7 @@
     -fx-background-insets: 0;
     -fx-background-color: -foreground-color;
     -fx-text-fill: -text-color;
-    
+
     -fx-border-radius: 3;
     -fx-background-radius: 3;
     -fx-font-weight: bold;
@@ -144,4 +147,58 @@
     -fx-border-color: -border-color;
 }
 
+.tab-header-area > .headers-region,
+.tab-header-area > .tab-header-background,
+.tab-header-area > .control-buttons-tab {
+    -fx-background-color: transparent;
+}
 
+.tab-header-area {
+    -fx-padding: 0 0 0 8;
+}
+
+.tab-pane {
+    -fx-tab-min-height: 28;
+    -fx-tab-min-width: 90;
+}
+
+.tab-header-area .tab {
+    -fx-border-width: 1;
+    -fx-border-radius: 5 5 0 0;
+    -fx-background-radius: 5 5 0 0;
+
+    -fx-background-color: transparent, transparent;
+}
+
+.tab .tab-label {
+    -fx-text-fill: -text-color !important;
+    -fx-graphic-text-gap: 8;
+}
+
+.tab-header-area .tab:selected {
+    -fx-background-color: -border-color;
+    -fx-font-weight: bolder;
+}
+
+.tab-content-area {
+    -fx-border-width: 1 0 1 0;
+    -fx-border-color: -border-color;
+}
+
+#bundle .tab-label {
+    -fx-graphic: url("../img/bundles.png");
+    -fx-pref-height: 16;
+    -fx-max-height: 16;
+}
+
+#icons .tab-label {
+    -fx-graphic: url("../img/icons.png");
+    -fx-pref-height: 16;
+    -fx-max-height: 16;
+}
+
+#fonts .tab-label {
+    -fx-graphic: url("../img/font.png");
+    -fx-pref-height: 16;
+    -fx-max-height: 16;
+}

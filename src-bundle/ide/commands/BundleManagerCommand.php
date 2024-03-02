@@ -3,6 +3,7 @@
 namespace ide\commands;
 
 use ide\editors\AbstractEditor;
+use ide\Logger;
 use ide\misc\AbstractCommand;
 use php\gui\UXButton;
 use php\gui\UXForm;
@@ -14,6 +15,10 @@ use php\lang\Thread;
 use php\lib\str;
 use shop\BundleService;
 use shop\dto\Bundle;
+use shop\ui\category\AbstractCategory;
+use shop\ui\category\BundleCategory;
+use shop\ui\category\FontsCategory;
+use shop\ui\category\IconsCategory;
 use shop\ui\UIActionButton;
 use shop\ui\UIBundleItem;
 use shop\ui\UIShop;
@@ -55,14 +60,26 @@ class BundleManagerCommand extends AbstractCommand
     public function makeUiForHead()
     {
         $this->form = new UIShop();
+        $this->form->registerCategory(BundleCategory::class);
+        $this->form->registerCategory(FontsCategory::class);
+        $this->form->registerCategory(IconsCategory::class);
+
         $this->service = new BundleService();
 
         $thread = new Thread(function () {
             $installList = $this->service->getInstalledList();
 
-            foreach ($this->service->getList() as $bundle) {
-                uiLater(function () use ($installList, $bundle) {
-                    $this->makeItem($bundle, $installList);
+            foreach ($this->form->getCategories() as $category) {
+                uiLater(function () use ($installList, $category) {
+                    foreach ($this->service->getList()[$category->getKey()] as $item) {
+                        if (!is_object($item)) {
+                            Logger::error(var_export($item, true));
+                            Logger::error(var_export($this->service->getList()[$category->getKey()], true));
+                        }
+
+                        Logger::error($category->getKey() . ': ' . $item->name);
+                        $this->makeItem($item, $installList, $category);
+                    }
                 });
             }
         });
@@ -74,11 +91,7 @@ class BundleManagerCommand extends AbstractCommand
         $btn->graphic = ico("cart");
         $btn->font->bold = true;
         $btn->text = "Магазин пакетов";
-        try {
-            $btn->on("click", [$this, "onExecute"]);
-        } catch (\Exception $ignore) {
-
-        }
+        $btn->on("click", [$this, "onExecute"]);
 
         return $btn;
     }
@@ -86,13 +99,15 @@ class BundleManagerCommand extends AbstractCommand
     /**
      * @param Bundle $bundle
      * @param $installList
+     * @param AbstractCategory $category
      * @return void
      * @throws IOException
      */
-    function makeItem(Bundle $bundle, $installList): void
+    function makeItem(Bundle $bundle, $installList, AbstractCategory $category): void
     {
         $node = new UIBundleItem();
-        $this->form->addItem($node);
+        $this->form->addItem($node, $category);
+        // $category->setContent($node->getNode());
 
         $node->setName($bundle->name);
         $node->setAuthor($bundle->author);

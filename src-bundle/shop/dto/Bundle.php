@@ -2,6 +2,7 @@
 
 namespace shop\dto;
 
+use ide\Logger;
 use php\io\Stream;
 use php\lib\str;
 use shop\bundle\GithubProvider;
@@ -34,11 +35,7 @@ class Bundle
         }
         $this->version = $data["version"];
 
-        if (str::startsWith($data["url"], "http")) {
-            $this->url = $data["url"];
-        } else {
-            $this->url = GithubProvider::BASE_HOST . 'bundles/' . $data["url"];
-        }
+        $this->url = GithubProvider::BASE_HOST . $data["url"];
 
         $this->description = $data["description"];
         $this->exampleUrl = $data["exampleUrl"];

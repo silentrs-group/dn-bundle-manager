@@ -18,7 +18,7 @@ class GithubProvider extends BaseBundleProvider
     public function update()
     {
         try {
-            $this->list = Http::get(self::BASE_HOST . 'bundle-list-v2.json', "json");
+            $this->list = Http::get(self::BASE_HOST . 'bundle-list-v3.json', "json");
         } catch (\Exception $exception) {
             Logger::error($exception->getMessage());
             try {

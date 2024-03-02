@@ -28,3 +28,15 @@
 .listitem .example-action-button {
     -fx-background-image: url("../img/undefined_w.png");
 }
+
+#bundle .tab-label {
+    -fx-graphic: url("../img/bundles_w.png");
+}
+
+#icons .tab-label {
+    -fx-graphic: url("../img/icons_w.png");
+}
+
+#fonts .tab-label {
+    -fx-graphic: url("../img/font_w.png");
+}
