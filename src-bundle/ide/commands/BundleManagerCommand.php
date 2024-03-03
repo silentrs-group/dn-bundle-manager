@@ -19,6 +19,7 @@ use shop\ui\category\AbstractCategory;
 use shop\ui\category\BundleCategory;
 use shop\ui\category\FontsCategory;
 use shop\ui\category\IconsCategory;
+use shop\ui\category\TestCategory;
 use shop\ui\UIActionButton;
 use shop\ui\UIBundleItem;
 use shop\ui\UIShop;
@@ -60,9 +61,9 @@ class BundleManagerCommand extends AbstractCommand
     public function makeUiForHead()
     {
         $this->form = new UIShop();
-        $this->form->registerCategory(BundleCategory::class);
-        $this->form->registerCategory(FontsCategory::class);
-        $this->form->registerCategory(IconsCategory::class);
+        $this->form->addCategory(BundleCategory::class);
+        $this->form->addCategory(FontsCategory::class);
+        $this->form->addCategory(IconsCategory::class);
 
         $this->service = new BundleService();
 
@@ -72,12 +73,6 @@ class BundleManagerCommand extends AbstractCommand
             foreach ($this->form->getCategories() as $category) {
                 uiLater(function () use ($installList, $category) {
                     foreach ($this->service->getList()[$category->getKey()] as $item) {
-                        if (!is_object($item)) {
-                            Logger::error(var_export($item, true));
-                            Logger::error(var_export($this->service->getList()[$category->getKey()], true));
-                        }
-
-                        Logger::error($category->getKey() . ': ' . $item->name);
                         $this->makeItem($item, $installList, $category);
                     }
                 });
@@ -118,6 +113,12 @@ class BundleManagerCommand extends AbstractCommand
         $node->setUrlExample($bundle->exampleUrl);
 
         $node->setActionButton(UIActionButton::STATE_INSTALL, function () use ($bundle, $node) {
+            try {
+                if (($category = $this->form->getActiveCategory())->getKey() != 'bundle') {
+                    return $category->install($bundle->url, $node);
+                }
+            } catch (\Exception $ignore) {}
+
             $this->service->install($bundle->url, $node);
         });
 

@@ -33,10 +33,9 @@ class Bundle
         } else {
             $this->image = GithubProvider::BASE_HOST . 'images/' . $data["image"];
         }
+
         $this->version = $data["version"];
-
         $this->url = GithubProvider::BASE_HOST . $data["url"];
-
         $this->description = $data["description"];
         $this->exampleUrl = $data["exampleUrl"];
     }

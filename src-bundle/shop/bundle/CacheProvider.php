@@ -57,9 +57,9 @@ class CacheProvider extends BaseBundleProvider
             throw new RuntimeException("Response data is broken");
         }
 
-        $githubList["bundle"] = Flow::of($githubList["bundle"])->map([$this, 'sort'])->toArray();
-        $githubList["fonts"] = Flow::of($githubList["fonts"])->map([$this, 'sort'])->toArray();
-        $githubList["icons"] = Flow::of($githubList["icons"])->map([$this, 'sort'])->toArray();
+        foreach ($githubList as $key => $item) {
+            $githubList[$key] = Flow::of($item)->map([$this, 'sort'])->toArray();
+        }
 
         $this->list = $githubList;
 

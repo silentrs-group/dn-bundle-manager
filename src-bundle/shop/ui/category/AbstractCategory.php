@@ -3,7 +3,11 @@
 namespace shop\ui\category;
 
 use gui;
+use http\Exception\RuntimeException;
 use ide\Logger;
+use php\compress\ZipFile;
+use php\io\File;
+use php\lib\fs;
 
 abstract class AbstractCategory
 {
@@ -50,7 +54,6 @@ abstract class AbstractCategory
             $this->tab->draggable = false;
             $this->tab->closable = false;
             $this->tab->content = $this->scrollPane = new UXScrollPane($anc = new UXAnchorPane());
-            // $this->tab->graphic = new UXImageView(new UXImage($this->getIcon(), 16, 16));
             $this->tab->id = $this->id;
 
             $anc->children->add($this->container = new UXTilePane);
@@ -66,11 +69,7 @@ abstract class AbstractCategory
             $this->scrollPane->fittoHeight = true;
 
             $this->container->leftAnchor =
-            $this->container->rightAnchor = 0;/*
-            $this->container->topAnchor =
-            $this->container->bottomAnchor = 0; */
-            //$this->container->backgroundColor = '#FF00000F';
-
+            $this->container->rightAnchor = 0;
 
             $this->container->padding = 5;
             $this->container->hgap = 10;
@@ -83,6 +82,21 @@ abstract class AbstractCategory
     public function setContent($node)
     {
         $this->container->children->add($node);
+    }
+
+    public function install($url)
+    {
+        throw new RuntimeException('Not implementation method ' . __METHOD__);
+    }
+
+    protected function unpack(File $file, $to)
+    {
+        $to = fs::normalize($to);
+        fs::makeDir($to);
+
+        $zip = new ZipFile($file);
+        $zip->unpack($to);
+        $file->deleteOnExit();
     }
 
     public function removeContent($node)

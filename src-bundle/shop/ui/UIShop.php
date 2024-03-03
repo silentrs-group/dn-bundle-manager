@@ -202,7 +202,7 @@ class UIShop
             if ($clear == null) {
                 $clear = new UXButton();
                 $clear->style = '-fx-background-color: transparent; -fx-border-color: transparent;';
-                $clear->graphic = Ide::getImage('clear.png', [16, 16]);
+                $clear->graphic = Ide::getImage('clear.png', [12, 12]);
                 $clear->rightAnchor = $this->search->rightAnchor;
                 $clear->y = $this->search->y;
                 $clear->height = $this->search->height;
@@ -273,18 +273,12 @@ class UIShop
      */
     public function updateList($search = null, AbstractCategory $category = null)
     {
-        Logger::warn(__METHOD__);
         $startIndex = $this->pagination->selectedPage * $this->pagination->pageSize;
         $endIndex = $startIndex + $this->pagination->pageSize;
 
-        foreach ($this->category as $_category) {
-            if ($_category->getKey() == $this->index) {
-                $category = $_category;
-                break;
-            }
+        if (($category = $this->getActiveCategory()) == null) {
+            return;
         }
-
-        if ($category == null) return;
 
         $category->clear();
 
@@ -380,7 +374,7 @@ class UIShop
         return $config;
     }
 
-    public function registerCategory($class)
+    public function addCategory($class)
     {
         $this->category[$class] = new $class();
         $this->tab->tabs->add($this->category[$class]->getTab());
@@ -392,5 +386,14 @@ class UIShop
     public function getCategories(): array
     {
         return $this->category;
+    }
+
+    public function getActiveCategory()
+    {
+        foreach ($this->category as $category) {
+            if ($category->getKey() == $this->index) return $category;
+        }
+
+        return null;
     }
 }
